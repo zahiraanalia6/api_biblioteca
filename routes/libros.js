@@ -3,6 +3,9 @@ const express = require("express");
 const router = express.Router();
 const Libro = require("../models/Libro");
 
+// Importamos la librería para validar scopes
+const { requiredScopes } = require("express-oauth2-jwt-bearer");
+
 // Ruta para obtener todos los libros
 router.get("/", async (req, res) => {
     try {
