@@ -1,26 +1,26 @@
-const express = require('express');
-const app = express();
-const mongoose = require('mongoose');
-const librosRouter = require('./routes/libros');
-const errorHandler = require('./middleware/errorHandler');
+const express = require("express");
 
-// Conexión a la base de datos MongoDB
-mongoose.connect("mongodb://localhost:27017/biblioteca", {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
+const { auth } = require("express-oauth2-jwt-bearer");
+const errorHandler = require("./middleware/errorHandler");
+
+// Configuracion Middleware con el Servidor de Autorización
+const autenticacion = auth({
+    audience: "http://localhost:3000/api/productos",
+    issuerBaseURL: "https://dev-utn-frc-iaew.auth0.com/",
+    tokenSigningAlg: "RS256",
 });
 
-// Middleware para parsear datos JSON en las solicitudes
+const app = express();
 app.use(express.json());
 
-// Rutas
-app.use('/libros', librosRouter);
+// Importamos el Router de Libros
+const librosRouter = require("./routes/libros");
 
-// Middleware de manejo de errores
+//Configuramos el middleware de autenticacion
+app.use("/libros", autenticacion, librosRouter);
+
 app.use(errorHandler);
 
-// Iniciar el servidor en el puerto 3000
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Servidor iniciado en el puerto ${PORT}`);
+app.listen(3000, () => {
+    console.log("Servidor iniciado en el puerto 3000");
 });
